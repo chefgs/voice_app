@@ -1,9 +1,8 @@
-from flask import Flask, request
-from flask import send_file
+from flask import Flask, request, send_file
+import os
 import speech_recognition as sr
-from docx import Document
 import base64
-import io
+import tempfile
 
 app = Flask(__name__)
 
@@ -11,38 +10,33 @@ app = Flask(__name__)
 def voice_to_text():
     # Get audio data from request
     audio_data = base64.b64decode(request.form['audio'])
+    
+    # Save audio file temporarily
+    with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
+        temp_audio.write(audio_data)
+        temp_audio.flush()
 
-    # Convert audio to text
-    text = get_voice_input(audio_data)
+        # Initialize recognizer class (for recognizing the speech)
+        r = sr.Recognizer()
 
-    # Create document
-    if text is not None:
-        filename = "output.docx"
-        create_document(text, filename)
+        # Reading audio file as source
+        # listening the speech and store in audio_text variable
+        with sr.AudioFile(temp_audio.name) as source:
+            audio_text = r.record(source)
 
-        # Return the file as an attachment
-        return send_file(filename, as_attachment=True)
+        # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling
+        try:
+            # using google speech recognition
+            text = r.recognize_google(audio_text)
 
-    return "No text recognized", 400
+            # Create a file
+            with open('file.txt', 'w') as f:
+                f.write(text)
 
-def get_voice_input(audio_data):
-    # Initialize recognizer class (for recognizing the speech)
-    recognizer = sr.Recognizer()
+        except:
+            return "Sorry, I did not get that", 400
 
-    # Convert audio to text
-    with sr.AudioFile(io.BytesIO(audio_data)) as source:
-        audio_text = recognizer.record(source)
-
-    try:
-        # using google speech recognition
-        return recognizer.recognize_google(audio_text)
-    except:
-        return None
-
-def create_document(text, filename):
-    doc = Document()
-    doc.add_paragraph(text)
-    doc.save(filename)
+    return send_file('file.txt', as_attachment=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5000)
