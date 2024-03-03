@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<button onclick="startRecording()">Start Recording</button>
+<button onclick="stopRecording()">Stop Recording</button>
+<audio id="replay" controls></audio>
+
+<script>
+let mediaRecorder;
+let recordedChunks = [];
+
+async function startRecording() {
+    let stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.start();
+
+    mediaRecorder.ondataavailable = function(e) {
+        recordedChunks.push(e.data);
+    };
+}
+
+async function stopRecording() {
+    mediaRecorder.stop();
+
+    let blob = new Blob(recordedChunks, {
+        type: 'audio/wav'
+    });
+
+    // Replay the recorded audio
+    let audioURL = URL.createObjectURL(blob);
+    document.getElementById('replay').src = audioURL;
+
+    let formData = new FormData();
+    formData.append('audio', blob, 'audio.wav');
+
+    let response = await fetch('http://localhost:5000/transcribe', {
+        method: 'POST',
+        body: formData
+    });
+
+    let data = await response.json();
+    console.log(data);
+}
+</script>
+
+</body>
+</html>
