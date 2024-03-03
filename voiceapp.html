@@ -1,9 +1,41 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #007BFF;
+            cursor: pointer;
+        }
+        button:disabled {
+            background-color: #ccc;
+        }
+        audio {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
 <body>
 
-<button onclick="startRecording()">Start Recording</button>
-<button onclick="stopRecording()">Stop Recording</button>
+<button id="startBtn" onclick="startRecording()">Start Recording</button>
+<button id="stopBtn" onclick="stopRecording()" disabled>Stop Recording</button>
 <audio id="replay" controls></audio>
 
 <script>
@@ -18,6 +50,9 @@ async function startRecording() {
     mediaRecorder.ondataavailable = function(e) {
         recordedChunks.push(e.data);
     };
+
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
 }
 
 async function stopRecording() {
@@ -41,6 +76,9 @@ async function stopRecording() {
 
     let data = await response.json();
     console.log(data);
+
+    document.getElementById('startBtn').disabled = false;
+    document.getElementById('stopBtn').disabled = true;
 }
 </script>
 
