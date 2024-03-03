@@ -2,11 +2,45 @@
 <html>
 <head>
     <title>Voice to Text</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            text-align: center;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+        #record {
+            background-color: #4CAF50;
+        }
+        #stop {
+            background-color: #f44336;
+        }
+        #create-doc {
+            background-color: #008CBA;
+        }
+    </style>
 </head>
 <body>
-    <button id="record">Record</button>
-    <button id="stop" disabled>Stop</button>
-    <button id="create-doc" disabled>Create Document</button>
+    <div class="container">
+        <button id="record">Record</button>
+        <button id="stop" disabled>Stop</button>
+        <button id="create-doc" disabled>Create Document</button>
+    </div>
 
     <script>
         let chunks = [];
@@ -54,7 +88,7 @@
                 fetch('http://localhost:5000/voice_to_text', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Type': 'application/json',
                     },
                     body: 'audio=' + encodeURIComponent(base64Audio),
                 })
