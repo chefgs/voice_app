@@ -1,20 +1,18 @@
-from flask import Flask, render_template, request
+from flask import Flask, request
 import speech_recognition as sr
 from docx import Document
+import base64
+import io
 
 app = Flask(__name__)
 
-#@app.route('/')
-#def home():
-#    return render_template('index.html')
-
 @app.route('/voice_to_text', methods=['POST'])
 def voice_to_text():
-    # Get audio file from request
-    audio_file = request.files['audio']
+    # Get audio data from request
+    audio_data = base64.b64decode(request.form['audio'])
 
     # Convert audio to text
-    text = get_voice_input(audio_file)
+    text = get_voice_input(audio_data)
 
     # Create document
     if text is not None:
@@ -22,12 +20,12 @@ def voice_to_text():
 
     return "Document created successfully", 200
 
-def get_voice_input(audio_file):
+def get_voice_input(audio_data):
     # Initialize recognizer class (for recognizing the speech)
     recognizer = sr.Recognizer()
 
     # Convert audio to text
-    with sr.AudioFile(audio_file) as source:
+    with sr.AudioFile(io.BytesIO(audio_data)) as source:
         audio_text = recognizer.record(source)
 
     try:
@@ -42,4 +40,4 @@ def create_document(text, filename):
     doc.save(filename)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
