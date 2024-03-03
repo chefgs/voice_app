@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice to Text</title>
+</head>
+<body>
+    <button id="record">Record</button>
+    <button id="stop" disabled>Stop</button>
+    <button id="create-doc" disabled>Create Document</button>
+
+    <script>
+        let chunks = [];
+        let recorder;
+        const recordButton = document.getElementById('record');
+        const stopButton = document.getElementById('stop');
+        const createDocButton = document.getElementById('create-doc');
+
+        recordButton.onclick = function() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+
+                    stopButton.disabled = false;
+                    recordButton.disabled = true;
+
+                    mediaRecorder.ondataavailable = function(e) {
+                        chunks.push(e.data);
+                    }
+
+                    stopButton.onclick = function() {
+                        mediaRecorder.stop();
+                        stopButton.disabled = true;
+                        createDocButton.disabled = false;
+                    }
+
+                    mediaRecorder.onstop = function(e) {
+                        recorder = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+                        chunks = [];
+                        recordButton.disabled = false;
+                    }
+                })
+                .catch(function(err) {
+                    console.log('The following error occurred: ' + err);
+                })
+        };
+
+        createDocButton.onclick = function() {
+            var reader = new FileReader();
+
+            reader.onloadend = function() {
+                var base64Audio = reader.result.split(',')[1];
+
+                fetch('http://localhost:5000/voice_to_text', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'audio=' + encodeURIComponent(base64Audio),
+                })
+                .then(response => response.text())
+                .then(data => console.log(data))
+                .catch((error) => {
+                  console.error('Error:', error);
+                });
+            }
+
+            reader.readAsDataURL(recorder);
+        };
+    </script>
+</body>
+</html>
