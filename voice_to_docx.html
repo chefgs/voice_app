@@ -88,7 +88,7 @@
                 fetch('http://localhost:5000/voice_to_text', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded',
                     },
                     body: 'audio=' + encodeURIComponent(base64Audio),
                 })
