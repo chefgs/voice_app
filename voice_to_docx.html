@@ -48,67 +48,76 @@
         const recordButton = document.getElementById('record');
         const stopButton = document.getElementById('stop');
         const createDocButton = document.getElementById('create-doc');
+recordButton.onclick = function() {
+    console.log('Record button clicked');
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            console.log('Got user media');
+            const mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
 
-        recordButton.onclick = function() {
-            navigator.mediaDevices.getUserMedia({ audio: true })
-                .then(stream => {
-                    const mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.start();
+            stopButton.disabled = false;
+            recordButton.disabled = true;
 
-                    stopButton.disabled = false;
-                    recordButton.disabled = true;
-
-                    mediaRecorder.ondataavailable = function(e) {
-                        chunks.push(e.data);
-                    }
-
-                    stopButton.onclick = function() {
-                        mediaRecorder.stop();
-                        stopButton.disabled = true;
-                        createDocButton.disabled = false;
-                    }
-
-                    mediaRecorder.onstop = function(e) {
-                        recorder = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
-                        chunks = [];
-                        recordButton.disabled = false;
-                    }
-                })
-                .catch(function(err) {
-                    console.log('The following error occurred: ' + err);
-                })
-        };
-
-        createDocButton.onclick = function() {
-            var reader = new FileReader();
-
-            reader.onloadend = function() {
-                var base64Audio = reader.result.split(',')[1];
-
-                fetch('http://localhost:5000/voice_to_text', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: 'audio=' + encodeURIComponent(base64Audio),
-                })
-                .then(response => response.blob())
-                .then(data => {
-                    var url = window.URL.createObjectURL(data);
-                    var a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'file.txt';
-                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
-                    a.click();    
-                    a.remove();  //afterwards we remove the element again         
-                })
-                .catch((error) => {
-                  console.error('Error:', error);
-                });
+            mediaRecorder.ondataavailable = function(e) {
+                console.log('Data available');
+                chunks.push(e.data);
             }
 
-            reader.readAsDataURL(recorder);
-        };
+            stopButton.onclick = function() {
+                console.log('Stop button clicked');
+                mediaRecorder.stop();
+                stopButton.disabled = true;
+                createDocButton.disabled = false;
+            }
+
+            mediaRecorder.onstop = function(e) {
+                console.log('MediaRecorder stopped');
+                recorder = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
+                chunks = [];
+                recordButton.disabled = false;
+            }
+        })
+        .catch(function(err) {
+            console.log('The following error occurred: ' + err);
+        })
+};
+
+createDocButton.onclick = function() {
+    console.log('Create Document button clicked');
+    var reader = new FileReader();
+
+    reader.onloadend = function() {
+        console.log('File read');
+        var base64Audio = reader.result.split(',')[1];
+
+        fetch('http://localhost:5000/voice_to_text', {
+            method: 'POST',
+            mode:"no-cors",
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'audio=' + encodeURIComponent(base64Audio),
+        })
+        .then(response => response.blob())
+        .then(data => {
+            console.log('Received response');
+            var url = window.URL.createObjectURL(data);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = 'file.txt';
+            document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+            a.click();    
+            a.remove();  //afterwards we remove the element again         
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    }
+
+    console.log('Reading file');
+    reader.readAsDataURL(recorder);
+};
     </script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 from flask import Flask, request, send_file
 import os
 import speech_recognition as sr
-import base64
+# import base64
 import tempfile
 
 app = Flask(__name__)
@@ -9,7 +9,7 @@ app = Flask(__name__)
 @app.route('/voice_to_text', methods=['POST'])
 def voice_to_text():
     # Get audio data from request
-    audio_data = base64.b64decode(request.form['audio'])
+    audio_data = request.form['audio']
     
     # Save audio file temporarily
     with tempfile.NamedTemporaryFile(delete=True) as temp_audio:
