@@ -30,22 +30,13 @@
             width: 100%;
             margin-top: 20px;
         }
-        canvas {
-            display: block;
-            width: 100%;
-            margin-top: 20px;
-        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.3.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.9.359/pdf.js"></script>
 </head>
 <body>
 
 <button id="startBtn" onclick="startRecording()">Start Recording</button>
 <button id="stopBtn" onclick="stopRecording()" disabled>Stop Recording</button>
-<button id="displayBtn" onclick="displayDocument()" disabled>Display Document</button>
 <audio id="replay" controls></audio>
-<canvas id="pdfCanvas"></canvas>
 
 <script>
 let mediaRecorder;
@@ -87,34 +78,24 @@ async function stopRecording() {
     console.log(data);
 
     // Create a PDF document from the transcribed text
-    let doc = new jsPDF.jsPDF();
-    doc.text(data.transcription, 10, 10);
-    let pdfBlob = doc.output('blob');
+    let docResponse = await fetch('http://localhost:5001/create_document', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({text: data.transcription})
+    });
 
-    // Save the PDF blob for later use
-    window.pdfBlob = pdfBlob;
+    let pdfBlob = await docResponse.blob();
+
+    // Download the PDF document
+    let link = document.createElement('a');
+    link.href = URL.createObjectURL(pdfBlob);
+    link.download = 'transcription.pdf';
+    link.click();
 
     document.getElementById('startBtn').disabled = false;
     document.getElementById('stopBtn').disabled = true;
-    document.getElementById('displayBtn').disabled = false;
-}
-
-// Function to display the PDF document
-async function displayDocument() {
-    let pdf = await pdfjsLib.getDocument({data: window.pdfBlob}).promise;
-    let page = await pdf.getPage(1);
-    let scale = 1.5;
-    let viewport = page.getViewport({scale: scale});
-
-    let canvas = document.getElementById('pdfCanvas');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-
-    let renderContext = {
-        canvasContext: canvas.getContext('2d'),
-        viewport: viewport
-    };
-    page.render(renderContext);
 }
 </script>
 
