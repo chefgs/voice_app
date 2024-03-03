@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask import send_file
 import speech_recognition as sr
 from docx import Document
 import base64
@@ -16,9 +17,13 @@ def voice_to_text():
 
     # Create document
     if text is not None:
-        create_document(text, "output.docx")
+        filename = "output.docx"
+        create_document(text, filename)
 
-    return "Document created successfully", 200
+        # Return the file as an attachment
+        return send_file(filename, as_attachment=True)
+
+    return "No text recognized", 400
 
 def get_voice_input(audio_data):
     # Initialize recognizer class (for recognizing the speech)

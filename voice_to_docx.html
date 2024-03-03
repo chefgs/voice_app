@@ -33,12 +33,17 @@
         #create-doc {
             background-color: #008CBA;
         }
+        #replay {
+            background-color: #e7e7e7;
+            color: black;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <button id="record">Record</button>
         <button id="stop" disabled>Stop</button>
+        <button id="replay" disabled>Replay</button>
         <button id="create-doc" disabled>Create Document</button>
     </div>
 
@@ -47,6 +52,7 @@
         let recorder;
         const recordButton = document.getElementById('record');
         const stopButton = document.getElementById('stop');
+        const replayButton = document.getElementById('replay');
         const createDocButton = document.getElementById('create-doc');
 
         recordButton.onclick = function() {
@@ -65,6 +71,7 @@
                     stopButton.onclick = function() {
                         mediaRecorder.stop();
                         stopButton.disabled = true;
+                        replayButton.disabled = false;
                         createDocButton.disabled = false;
                     }
 
@@ -79,12 +86,18 @@
                 })
         };
 
+        replayButton.onclick = function() {
+            let audioURL = URL.createObjectURL(recorder);
+            let audio = new Audio(audioURL);
+            audio.play();
+        };
+
         createDocButton.onclick = function() {
             var reader = new FileReader();
-
+    
             reader.onloadend = function() {
                 var base64Audio = reader.result.split(',')[1];
-
+    
                 fetch('http://localhost:5000/voice_to_text', {
                     method: 'POST',
                     headers: {
@@ -92,13 +105,21 @@
                     },
                     body: 'audio=' + encodeURIComponent(base64Audio),
                 })
-                .then(response => response.text())
-                .then(data => console.log(data))
+                .then(response => response.blob())
+                .then(data => {
+                    var url = window.URL.createObjectURL(data);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'output.docx';
+                    document.body.appendChild(a); // we need to append the element to the dom -> otherwise it will not work in firefox
+                    a.click();    
+                    a.remove();  //afterwards we remove the element again         
+                })
                 .catch((error) => {
                   console.error('Error:', error);
                 });
             }
-
+    
             reader.readAsDataURL(recorder);
         };
     </script>
