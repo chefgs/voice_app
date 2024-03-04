@@ -24,7 +24,7 @@ def voice_to_text():
         with sr.AudioFile(temp_audio.name) as source:
             audio_text = r.record(source)
 
-        # recoginize_() method will throw a request error if the API is unreachable, hence using exception handling
+        # recognize_() method will throw a request error if the API is unreachable, hence using exception handling
         try:
             # using google speech recognition
             text = r.recognize_google(audio_text)

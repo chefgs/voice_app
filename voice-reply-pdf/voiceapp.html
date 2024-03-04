@@ -36,7 +36,7 @@
 
 <button id="startBtn" onclick="startRecording()">Start Recording</button>
 <button id="stopBtn" onclick="stopRecording()" disabled>Stop Recording</button>
-<audio id="replay" controls></audio>
+
 <button id="downloadBtn" onclick="downloadDocument()" disabled>Download Document</button>
 
 <script>
@@ -65,14 +65,15 @@ async function stopRecording() {
     });
 
     // Replay the recorded audio
-    let audioURL = URL.createObjectURL(blob);
-    document.getElementById('replay').src = audioURL;
+    // let audioURL = URL.createObjectURL(blob);
+    // document.getElementById('replay').src = audioURL;
 
     let formData = new FormData();
     formData.append('audio', blob, 'audio.wav');
 
     let response = await fetch('http://localhost:5000/transcribe', {
         method: 'POST',
+        mode:"no-cors",
         body: formData
     });
 
@@ -82,6 +83,7 @@ async function stopRecording() {
     // Create a PDF document from the transcribed text
     let docResponse = await fetch('http://localhost:5001/create_document', {
         method: 'POST',
+        mode:"no-cors",
         headers: {
             'Content-Type': 'application/json'
         },
