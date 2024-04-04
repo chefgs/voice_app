@@ -11,6 +11,8 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         padding: theme.spacing(2),
+        backgroundColor: '#aff', // Add a background color
+        boxShadow: '0px 6px 6px 6px rgba(0,0,1,0.3)', // Add a box shadow
     },
     button: {
         margin: theme.spacing(1),
@@ -18,6 +20,11 @@ const useStyles = makeStyles((theme) => ({
     text: {
         marginTop: theme.spacing(2),
         wordWrap: 'break-word',
+        padding: theme.spacing(2),
+    },
+    paper: {
+        marginTop: theme.spacing(2),
+        marginBottom: theme.spacing(2),
     },
 }));
 
@@ -96,7 +103,7 @@ const VoiceInput = () => {
     };
 
     const classes = useStyles();
-    
+
     return (
         <Paper className={classes.root}>
             <Typography variant="h4" component="h1">
@@ -111,9 +118,11 @@ const VoiceInput = () => {
             <Button variant="contained" color="default" onClick={downloadFile} className={classes.button}>
                 Download File
             </Button>
-            <Typography variant="body1" className={classes.text}>
-                {text}
-            </Typography>
+            <Paper className={classes.paper}>
+                <Typography variant="body1" className={classes.text}>
+                    {text}
+                </Typography>
+            </Paper>
         </Paper>
     );
 };

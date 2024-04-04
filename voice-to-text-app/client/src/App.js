@@ -1,14 +1,38 @@
 import React from 'react';
-//import './App.css';
+import { makeStyles } from '@material-ui/core/styles';
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import VoiceInput from './components/VoiceInput';
 
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100vh',
+    backgroundColor: '#fef0f0',
+    boxShadow: '0px 3px 3px 3px rgba(0,0,0,0.3)',
+  },
+  header: {
+    padding: theme.spacing(2),
+    marginBottom: theme.spacing(2),
+    backgroundColor: '#11ffee',
+    color: '#000',
+  },
+}));
+
 function App() {
+  const classes = useStyles();
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <h2>Voice to Text App</h2>
-        <VoiceInput />
-      </header>
+    <div className={classes.root}>
+      <Paper className={classes.header}>
+        <Typography variant="h3" component="h3">
+          Voice to Text App
+        </Typography>
+      </Paper>
+      <VoiceInput/>
     </div>
   );
 }
