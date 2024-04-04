@@ -169,3 +169,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Other dirs
+saved_texts
+.DS_Store

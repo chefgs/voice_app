@@ -5,7 +5,7 @@ import os
 
 app = Flask(__name__)
 # CORS(app)  # Enable CORS if you're calling the API from a different domain
-CORS(app, resources={r"/upload": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/upload": {"origins": "http://localhost:3001"}})
 
 # Directory where uploaded files will be saved
 UPLOAD_FOLDER = 'uploads'
