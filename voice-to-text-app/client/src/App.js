@@ -11,13 +11,13 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     height: '100vh',
-    backgroundColor: '#fef0f0',
+    backgroundColor: '#888',
     boxShadow: '0px 3px 3px 3px rgba(0,0,0,0.3)',
   },
   header: {
     padding: theme.spacing(2),
     marginBottom: theme.spacing(2),
-    backgroundColor: '#11ffee',
+    backgroundColor: '#ffffee',
     color: '#000',
   },
 }));

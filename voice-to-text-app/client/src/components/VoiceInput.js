@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'column',
         alignItems: 'center',
         padding: theme.spacing(2),
-        backgroundColor: '#aff', // Add a background color
+        backgroundColor: '#ffe', // Add a background color
         boxShadow: '0px 6px 6px 6px rgba(0,0,1,0.3)', // Add a box shadow
     },
     button: {
@@ -72,7 +72,7 @@ const VoiceInput = () => {
     };
 
     const sendTextToServer = (text) => {
-        axios.post('http://localhost:5000/api/save', { text })
+        axios.post('https://super-duper-space-chainsaw-jpqrp44j97c4rq-5000.app.github.dev/api/save', { text })
             .then(response => {
                 alert('Text saved successfully');
                 console.log(response.data);
@@ -86,7 +86,7 @@ const VoiceInput = () => {
     const downloadFile = async () => {
         try {
             const response = await axios({
-                url: 'http://localhost:5000/api/download/latest',
+                url: 'https://super-duper-space-chainsaw-jpqrp44j97c4rq-5000.app.github.dev/api/download/latest',
                 method: 'GET',
                 responseType: 'blob', // Important
             });
@@ -110,7 +110,7 @@ const VoiceInput = () => {
                 Voice Input
             </Typography>
             <Button variant="contained" color="primary" onClick={startListening} disabled={isListening} className={classes.button}>
-                Start Listening
+                Start Speech Recording
             </Button>
             <Button variant="contained" color="secondary" onClick={stopListening} disabled={!isListening} className={classes.button}>
                 Stop and Save
